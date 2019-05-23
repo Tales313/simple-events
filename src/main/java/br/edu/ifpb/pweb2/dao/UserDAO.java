@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
-import br.edu.ifpb.pweb2.model.Evento;
 import br.edu.ifpb.pweb2.model.User;
 
 @Repository
@@ -19,14 +18,13 @@ public class UserDAO {
 	@PersistenceContext
 	protected EntityManager manager;
 
-	public static UserDAO getInstance(){
-		if (instance == null){
+	public static UserDAO getInstance() {
+		if (instance == null) {
 			instance = new UserDAO();
 		}
 
 		return instance;
 	}
-
 
 	@Transactional
 	public void gravar(User user) {
@@ -34,14 +32,20 @@ public class UserDAO {
 	}
 
 	public List<User> findAll() {
-		return manager.createQuery("select u from User u").getResultList();
+		return manager.createQuery("select u from User u", User.class).getResultList();
 	}
 
 	public User findByEmail(String email) {
-		Query query = manager.createQuery("select u from User u where u.email = :email");
+		Query query = manager.createQuery("select u from User u where u.email = :email", User.class);
 		query.setParameter("email", email);
-		return (User)query.getSingleResult();
+		try {
+			User u = (User) query.getSingleResult();
+			return u;
+		}catch(Exception e) {
+			return null;
+		}
 	}
+
 	public User findByName(String nome) {
 		return manager.find(User.class, nome);
 	}
@@ -49,7 +53,7 @@ public class UserDAO {
 	public User findById(Long id) {
 		return manager.find(User.class, id);
 	}
-	
+
 //	@Transactional
 //	public User update(User user) {
 //		return manager.merge(user);
@@ -62,5 +66,3 @@ public class UserDAO {
 		return user;
 	}
 }
-
-

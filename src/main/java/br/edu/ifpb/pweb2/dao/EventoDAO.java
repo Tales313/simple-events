@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import br.edu.ifpb.pweb2.model.Evento;
-import br.edu.ifpb.pweb2.model.User;
 
 @Repository
 public class EventoDAO {
@@ -40,11 +39,11 @@ public class EventoDAO {
 	}
 	
 	@Transactional
-	public Evento update(Long id,Evento evento) {	   
+	public Evento update(Long id, Evento evento) {   
 		Evento removed = manager.find(Evento.class, id);
 		manager.remove(removed);
-	   manager.persist(evento);
-	   return evento;
+		manager.persist(evento);
+	    return evento;
 	}
 	
 	public Evento findById(Long id) {
