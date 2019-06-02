@@ -56,7 +56,7 @@ body {
 	</ul>
 	<nav class="teal lighten-2">
 		<div class="nav-wrapper">
-			<a href="#!" class="brand-logo">Simple event</a>
+			<a href="#!" class="brand-logo">Simple events</a>
 			<ul class="right hide-on-med-and-down">
 				<li><a href="${pageContext.request.contextPath }/eventos"><i
 						class="material-icons left">home</i>Home</a></li>
@@ -76,7 +76,7 @@ body {
 	<!-- Formulario de Cadastro -->
 	<div class="row container">
 		<p>&nbsp;</p>
-		<form:form action="${pageContext.request.contextPath }/eventos"
+		<form:form action="${pageContext.request.contextPath }/eventos/add"
 			method="post" class="col s12 white " modelAttribute="evento">
 			<fieldset class="formulario">
 				<legend>
@@ -87,7 +87,7 @@ body {
 				<!--Campo Descricao -->
 				<div class="input-field col s12">
 					<i class="material-icons prefix">event_note</i>
-					<form:input path="descricao" />
+					<form:input autofocus="autofocus" type="text" required="required" path="descricao" />
 					<form:errors class="center red-text" path="descricao" />
 					<label for="descricao">Descricao</label>
 				</div>
@@ -95,7 +95,7 @@ body {
 				<!--Campo Data -->
 				<div class="input-field col s12">
 					<i class="material-icons prefix">calendar_today</i>
-					<form:input path="data" type="date" />
+					<form:input path="data" required="required" type="date" />
 					<form:errors class="center red-text" path="data" />
 					<label for="data">Data</label>
 				</div>
@@ -103,7 +103,7 @@ body {
 				<!--Campo Local -->
 				<div class="input-field col s12">
 					<i class="material-icons prefix">location_on</i>
-					<form:input path="local" />
+					<form:input path="local" type="text" required="required" />
 					<form:errors class="center red-text" path="local" />
 					<label for="local">Local</label>
 				</div>
@@ -114,16 +114,15 @@ body {
 						<div class="row">
 							<div class="input-field col s2 	">
 								<p>
-									<label> 
-										<input type="checkbox" class="especialidades" name="especialidades" value="${esp.id }" class="filled-in" /> 
+									<label> <input type="checkbox" class="especialidades"
+										name="especialidades" value="${esp.id}" class="filled-in" />
 										<span>${esp.nome }</span>
 									</label>
-							</p>
+								</p>
 							</div>
 							<div class="input-field col s1">
-								<input name="quantidadevagas" class="quantidadevagas"
-								 disabled type="number" value="1" />
-								 <label for="especialidade">${vaga.especialidade.nome}</label>
+								<input name="quantidadevagas" class="quantidadevagas" disabled
+									type="number" value="1" /> <label for="especialidade">${vaga.especialidade.nome}</label>
 							</div>
 						</div>
 					</c:forEach>
@@ -131,8 +130,9 @@ body {
 
 				<!--Botões-->
 				<div class="input-field col s4">
-					<a href="${pageContext.request.contextPath }/eventos" class="btn red">cancelar</a>
-					<input type="submit" value="cadastrar" class="btn blue"> 
+					<a href="${pageContext.request.contextPath }/eventos"
+						class="btn red">cancelar</a> <input type="submit"
+						value="cadastrar" class="btn blue">
 				</div>
 			</fieldset>
 		</form:form>
@@ -147,13 +147,15 @@ body {
 	
 	let especialidades = document.querySelectorAll('.especialidades');
 	let quantidadevagas = document.querySelectorAll('.quantidadevagas');
-	especialidades.forEach(x=> {
-			x.addEventListener('change',function(){
+	especialidades.forEach((value, indice)=> {
+			value.addEventListener('change',function(){
 				if(this.checked) {
-			        quantidadevagas[this.value-1].disabled = false
-			        console.log(this.value)
+					console.log(indice)
+			        quantidadevagas[indice].disabled = false
 			        
-			    } 
+			    }else {
+			    	quantidadevagas[indice].disabled = true
+			    }
 			})
 		
 		

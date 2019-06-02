@@ -22,41 +22,32 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "tb_evento")
 public class Evento {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotEmpty(message = "Descri��o � obrigat�ria")
+	@NotEmpty(message = "Descricao e obrigatoria")
 	private String descricao;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@NotNull(message = "Data � obrigat�ria")
+	@NotNull(message = "Data e obrigatoria")
 	@Future(message = "A data deve estar no futuro")
 	private Date data;
-	private String local;
 	
-	/* rela��o com Dono do evento */
+	@NotEmpty(message = "Local e obrigatorio")
+	private String local;
+
 	@ManyToOne
 	private User owner;
-	
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "evento", cascade = CascadeType.ALL)
-	/* Rela��o com as vagas */
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "evento", cascade = CascadeType.REMOVE, orphanRemoval=true)
 	private List<Vaga> vagas = new ArrayList<>();
 
-	/* rela��o com avalia��o_eventos */
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "evento", cascade = CascadeType.ALL)
 	private List<Avaliacao_Evento> avaliacao_eventos = new ArrayList<>();
 
-	public Evento() {
-	}
-	
-	
-
-	public void setAvaliacao_eventos(List<Avaliacao_Evento> avaliacao_eventos) {
-		this.avaliacao_eventos = avaliacao_eventos;
-	}
-
-
+	public Evento() {};
 
 	public Evento(String d, Date dh, String l) {
 		super();
@@ -64,11 +55,15 @@ public class Evento {
 		this.data = dh;
 		this.local = l;
 	}
+	
+	public void setAvaliacao_eventos(List<Avaliacao_Evento> avaliacao_eventos) {
+		this.avaliacao_eventos = avaliacao_eventos;
+	}
 
 	public List<Avaliacao_Evento> getAvaliacao_eventos() {
 		return avaliacao_eventos;
 	}
-	
+
 	public void add(Vaga vaga) {
 		this.vagas.add(vaga);
 	}
@@ -124,7 +119,7 @@ public class Evento {
 	public void setLocal(String local) {
 		this.local = local;
 	}
-	
+
 	public void setVagas(List<Vaga> vagas) {
 		this.vagas = vagas;
 	}
