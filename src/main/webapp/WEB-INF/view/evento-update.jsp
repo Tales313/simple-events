@@ -77,10 +77,11 @@ body {
 	<!-- Formulario de Cadastro -->
 	<div class="row container">
 		<p>&nbsp;</p>
-		<form:form
-			action="${pageContext.request.contextPath }/eventos/update/${evento.id}"
-			method="post" class="col s12 white " modelAttribute="evento">
-			<fieldset class="formulario">
+		<fieldset class="formulario">
+			<form:form
+				action="${pageContext.request.contextPath }/eventos/update/${evento.id}"
+				method="post" class="col s12 white " id="form2"
+				modelAttribute="evento">
 				<legend>
 					<i class="material-icons prefix " style="font-size: 70px">event_available</i>
 				</legend>
@@ -124,10 +125,15 @@ body {
 					</form:errors>
 					<label for="local">Local</label>
 				</div>
-
+				<div class="center">
+					<input type="submit" value="Atualizar" class="btn blue">
+				</div>
+			</form:form>
+			<form:form
+				action="${pageContext.request.contextPath }/eventos/finalizar/${evento.id}"
+				method="post" class="col s12 white " id="form">
 				<!-- Título Vagas -->
 				<div class="row" style="margin-left: 43%;">
-
 					<div class="col s2">
 						<h5 class="light">Vagas</h5>
 					</div>
@@ -166,10 +172,17 @@ body {
 								<c:forEach var="candidatovaga" items="${vaga.candidato_vaga}">
 									<tr>
 										<td>${candidatovaga.candidato.email}</td>
-										<td>deferido</td>
-										<td>indeferido</td>
+										<td><label> <input name="${candidatovaga.id}"
+												type="radio" class="defere" value="DEFERIDO" /> <span>Deferido</span>
+										</label></td>
+										<td><label> <input name="${candidatovaga.id}"
+												type="radio" class="defere" value="NAO_DEFERIDO" /> <span>Indeferido</span>
+
+										</label></td>
 										<td></td>
 									</tr>
+									<input type="hidden" name="deferimentos_vagas"
+										value="${candidatovaga.id}">
 								</c:forEach>
 							</c:forEach>
 						</tbody>
@@ -194,12 +207,13 @@ body {
 
 				<!--Botões-->
 				<div class="input-field col s12">
-					<input type="submit" value="atualizar" class="btn blue"> <a
+					<input type="submit" value="Finalizar" class="btn blue"> <a
 						href="${pageContext.request.contextPath }/eventos" class="btn red">cancelar</a>
 				</div>
-			</fieldset>
-		</form:form>
+			</form:form>
+		</fieldset>
 	</div>
+
 
 	<!-- Modal Add Vaga -->
 	<div class="modal" id="modal"
@@ -234,7 +248,8 @@ body {
 						<!--Campo Quantidade -->
 						<div class="input-field  col s2 m2">
 							<input type="number" name="quantidadevagas" class="validate"
-								id="title" value="1" min="1" required> <label for="theme">Quantidade</label>
+								id="title" value="1" min="1" required> <label
+								for="theme">Quantidade</label>
 						</div>
 
 					</c:if>
@@ -253,8 +268,7 @@ body {
 	</div>
 
 	<!-- Modal update vaga -->
-	<div class="modal" id="modalupdate"
-		style="width: 30%; margin-top: 5%;">
+	<div class="modal" id="modalupdate" style="width: 30%; margin-top: 5%;">
 		<div class="modal-header blue">
 			<div class="classemuda"
 				style="color: white; display: flex; flex-direction: row;">
@@ -270,12 +284,13 @@ body {
 				<div class="row">
 					<!--Nome da vaga -->
 					<div class="col s5 ">
-						<h6 class="descricaovaga" style="font-weight:700; margin-top:15px;">nome da vaga :</h6>
+						<h6 class="descricaovaga"
+							style="font-weight: 700; margin-top: 15px;">nome da vaga :</h6>
 					</div>
-					
+
 					<!-- Id vaga -->
 					<input type="hidden" name="idvaga" class="inputIdVaga" value="">
-					
+
 					<!--Campo Quantidade -->
 					<div class=" col s2">
 						<input type="number" name="quantidadevaga" class="quantidadevaga"
@@ -308,6 +323,23 @@ body {
 		$(document).ready(function() {
 			$('select').formSelect();
 		});
+		
+		
+		
+		//gerar os inputs para cada candidato para resgatar no controller
+	    $("#form").submit( function(eventObj) {	
+	    	$('.defere:checked').each(function() {
+			     //deferimentos_values.push($(this).val());
+	    		$('<input />').attr('type', 'hidden')
+	            .attr('name', "deferejs")
+	            .attr('value', $(this).val())
+	            .appendTo('#form');
+			});	  	
+	    	
+	    	
+			
+	    
+	    });
 	</script>
 
 </body>
