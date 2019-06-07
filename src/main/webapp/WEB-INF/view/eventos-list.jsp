@@ -19,8 +19,7 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	rel="stylesheet">
 <!-- Compiled and minified CSS -->
@@ -30,15 +29,12 @@
 <!-- Compiled and minified JavaScript -->
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+
 </head>
 
 <style>
 body {
 	background-color: #F8F8F8;
-}
-
-.eventos {
-	margin-left: 10%;
 }
 
 .i-circle.md-login {
@@ -52,9 +48,89 @@ body {
 	color: black;
 }
 
-.gambiarra {
+.modal {
 	width: 25% !important;
+	margin-top: 5%
 }
+
+@import url("https://fonts.googleapis.com/css?family=Pacifico");
+
+.card-info, .card__meta a {
+	color: #3299BB !important;
+	display: inline-flex;
+	vertical-align: middle;
+	line-height: 2;
+	font-size: 1rem;
+}
+
+.card__meta i.small {
+	font-size: 1.5rem;
+}
+
+.card .card-content .card-title {
+	line-height: 34px;
+}
+
+.card__date {
+	background: #08c;
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	color: #fff;
+	text-align: center;
+	line-height: 13px;
+	font-weight: bold;
+	padding-top: 7px;
+}
+
+.card__date__day {
+	display: block;
+	font-size: 14px;
+}
+
+.card__date__month {
+	display: block;
+	font-size: 10px;
+	text-transform: uppercase;
+}
+
+.card .card-content .card-title {
+	color: #0D8080 !important;
+	line-height: 18px;
+}
+
+.card .card-title {
+	font-size: 18px;
+	font-weight: 400;
+}
+
+.card .card-content p {
+	color: #1E1E1E;
+	font-size: 13px;
+}
+
+.collapsible {
+	background: #fff;
+}
+
+.card-row {
+	margin-bottom: 4px;
+	margin-top: 4px;
+}
+
+.card-action i {
+	vertical-align: text-bottom;
+	font-size: 21px;
+}
+
+.collapsible-header {
+	background-color: #3299BB;
+	color: #fff;
+}
+
 </style>
 <body>
 	<!--menu-->
@@ -92,67 +168,148 @@ body {
 			</ul>
 		</div>
 	</nav>
+	<!-- open modal success -->
+	<c:if test="${not empty message_success}">
+		<script>
+			//open modal sucess
+			$(document).ready(function() {
+				$('#modalsuccess').modal();
+				$('#modalsuccess').modal('open');
+			});
+		</script>
+	</c:if>
 
-	<span style="color: #08c117;">${message_success}</span>
-	<span style="color: #e82727;">${message_error}</span>
+	<!-- open modal error -->
+	<c:if test="${not empty message_error}">
+		<script>
+			$(document).ready(function() {
+				$('#modalerror').modal();
+				$('#modalerror').modal('open');
+			});
+		</script>
+	</c:if>
 
 	<c:if test="${empty eventos}">
 		<p>Ainda não há eventos cadastrados.</p>
 	</c:if>
 
-	<ul class="eventos">
-		<c:forEach var="e" items="${eventos}">
 
-			<div class="col s12 ">
-				<div class="card-panel white hoverable lighten-5 z-depth-1"
-					style="width: 90%; height: 9em; padding-top: 5px">
-					<div class="row">
-						<div class="col s12 m4 l3">
-							<span class="black-text">
-								<h4>
-									<a href="${pageContext.request.contextPath}/eventos/${e.id}"
-										class="black-text text-darken-3" style="font-weight: 700">
-										${e.descricao} </a>
-								</h4> <small class="grey-text">created by ${e.owner.email }</small>
-							</span>
-						</div>
-						<div class="col s12 m4 l3">
-							<h4 class="locais blue-text">${e.local}</h4>
-							<small class="grey-text center">will happen in <fmt:formatDate
-									pattern="dd-MM-yyyy" value="${e.data}" /></small>
-						</div>
-						<div class="col s12 m4 l3">
-							<h4 class="locais blue-text">Vagas</h4>
-							<small class="grey-text center"> <c:forEach var="vaga"
-									items="${e.vagas}">
-            			${vaga.especialidade.nome } -
-            		</c:forEach>
-							</small>
-						</div>
-						<c:if test="${usuario.email == e.owner.email}">
-							<div class="col s12 m4 l1" style="margin-top: 20px">
-								<p>
-									<a
-										href="${pageContext.request.contextPath}/eventos/delete/${e.id}"><i
-										class="material-icons">delete_forever</i></a>
-								</p>
-							</div>
-							<%-- <div class="col s12 m4 l1" style = "margin-top: 20px">
-            	<p><a href="${pageContext.request.contextPath}/eventos/read/${e.id}"><i class="material-icons">create</i></a></p> 
-            </div> --%>
-						</c:if>
 
+
+	<div id="card-container" class="row">
+		<c:forEach var="evento" items="${eventos}">
+			<div class="col s12 m6 l4">
+				<!-- Card 1 -->
+				<div class="card">
+					<div class="card-content white-text">
+						<div class="card__date">
+							<span class="card__date__day">${evento.data.day}</span> <span
+								class="card__date__month">${evento.data.month}</span>
+						</div>
+						<div class="card__meta">
+							<a href="https://www.google.com.br/maps/place/${evento.local}"
+								target="_blank"><i class="small material-icons">room</i>${evento.local}</a>
+							<%-- <time>17th March</time> --%>
+						</div>
+						<span class="card-title grey-text text-darken-4 descricao">${evento.descricao}</span>
+						<span class="card-subtitle grey-text text-darken-2">Criado por:
+							${evento.owner.email} - </span>
+						<span class="card-subtitle text-darken-2 finalizado">${evento.finalizado}</span>
+						<span class="text-darken-2 card-info"><i
+							class="small material-icons">label</i> <c:forEach var="vaga"
+								items="${evento.vagas}">
+							${vaga.especialidade.nome},&nbsp;
+						</c:forEach> </span>
+					</div>
+					<div class="card-action">
+						<a href="${pageContext.request.contextPath}/eventos/${evento.id}"><i
+							class="material-icons">&nbsp;language</i>VISITAR EVENTO</a>
 					</div>
 				</div>
+				<!-- End of card -->
 			</div>
 		</c:forEach>
-	</ul>
+	</div>
+
+
+
+
+	<!-- Modal sucess -->
+	<div class="modal" id="modalsuccess">
+		<div class="modal-header green">
+			<div class="center white-text">
+				<i class="material-icons prefix center "
+					style="font-size: 50px; margin-bottom: 10px; margin-top: 10px; margin-left: 3px">
+					check_circle</i>
+				<h5 style="margin-top: 12px; margin-left: 5px"></h5>
+			</div>
+		</div>
+		<div class="modal-content">
+			<div class="center green-text">${message_success}</div>
+			<div class="modal-footer center">
+				<a class="btn green modal-close modal-action">Ok</a>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal error -->
+	<div class="modal" id="modalerror">
+		<div class="modal-header red">
+			<div class="center white-text">
+				<i class="material-icons prefix center "
+					style="font-size: 50px; margin-bottom: 10px; margin-top: 10px; margin-left: 3px">
+					error_outline</i>
+				<h5 style="margin-top: 12px; margin-left: 5px"></h5>
+			</div>
+		</div>
+		<div class="modal-content">
+			<div class="center red-text">${message_error}</div>
+			<div class="modal-footer center">
+				<a class="btn red modal-close modal-action">Close</a>
+			</div>
+		</div>
+	</div>
 
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$('.modal').modal();
-			$('.dropdown-trigger').dropdown();
+		//dropdown
+		//$('.modal').modal();
+		$('.dropdown-trigger').dropdown();
+		//modal sucess
+		$('#modalsuccess').modal();
+		function openModalSuccess() {
+			$('#modalsuccess').modal('open');
+		}
+		//modal error
+		$('#modalerror').modal();
+		function openModalError() {
+			$('#modalerror').modal('open');
+		}
+	</script>
+
+	<script type="text/javascript">
+	$(document).ready(function(){
+		let meses = document.querySelectorAll('.card__date__month')
+		meses.forEach(elemento => {
+			let array_meses = [
+				'JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN',
+				'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'
+			]
+			elemento.textContent = array_meses[elemento.textContent]
 		});
+		
+		let estados = document.querySelectorAll('.finalizado')
+		estados.forEach(elemento => {
+			console.log(elemento.textContent)
+			if (elemento.textContent == 'true') {
+				elemento.textContent = "Inscrições encerradas."
+				elemento.classList.add("red-text")
+			} else {
+				elemento.textContent = "Inscrições abertas."
+				elemento.classList.add("green-text")
+			}
+		});
+	});
 	</script>
 
 </body>

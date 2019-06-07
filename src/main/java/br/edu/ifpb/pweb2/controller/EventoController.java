@@ -61,34 +61,37 @@ public class EventoController {
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public ModelAndView create(HttpSession session, @ModelAttribute("evento") Evento evento,
-			@RequestParam("especialidades") List<Long> especialidades,
-			@RequestParam("quantidadevagas") List<Integer> quantidadevagas, BindingResult bindingResult,
+			@RequestParam(value="especialidades", required=false) List<Long> especialidades,
+			@RequestParam(value="quantidadevagas", required=false) List<Integer> quantidadevagas, BindingResult bindingResult,
 			RedirectAttributes attr, Model model) {
 		if (bindingResult.hasErrors())
 			return new ModelAndView("evento-form");
-		if (especialidades == null)
-			return new ModelAndView("evento-form");
-		else {
-			User user = (User) session.getAttribute("user");
-			evento.setOwner(user);
-			eventodao.gravar(evento);
-			Especialidade especialidade;
-			int i = 0;
-			for (long id : especialidades) {
-				especialidade = especialidadedao.findById(id);
-				Vaga vaga = new Vaga();
-				vaga.setEspecialidade(especialidade);
-				vaga.setQtd_vagas(quantidadevagas.get(i));
-				vaga.setEvento(evento);
-				vagadao.gravar(vaga);
-				evento.add(vaga);
-				i++;
-			}
-			eventodao.update(evento.getId(), evento);
-			attr.addFlashAttribute("message_success", "Evento cadastrado com sucesso!");
-			ModelAndView mv = new ModelAndView("redirect:/eventos/");
-			return mv;
+		if (especialidades == null) {
+			attr.addFlashAttribute("message_error", "Escolha pelo menos uma vaga!");
+			ModelAndView mav = new ModelAndView("redirect:/eventos/form");
+			return mav;
 		}
+		
+		User user = (User) session.getAttribute("user");
+		evento.setOwner(user);
+		eventodao.gravar(evento);
+		Especialidade especialidade;
+		int i = 0;
+		for (long id : especialidades) {
+			especialidade = especialidadedao.findById(id);
+			Vaga vaga = new Vaga();
+			vaga.setEspecialidade(especialidade);
+			vaga.setQtd_vagas(quantidadevagas.get(i));
+			vaga.setEvento(evento);
+			vagadao.gravar(vaga);
+			evento.add(vaga);
+			i++;
+		}
+		eventodao.update(evento.getId(), evento);
+		attr.addFlashAttribute("message_success", "Evento cadastrado com sucesso!");
+		ModelAndView mv = new ModelAndView("redirect:/eventos/");
+		return mv;
+		
 	}
 
 	// Está sendo usada para trazer a página de update do evento.
@@ -109,6 +112,9 @@ public class EventoController {
 		if (evento == null) {
 			attr.addFlashAttribute("message_error", "Evento não existe.");
 			return new ModelAndView("redirect:/eventos/");
+		} 
+		if(evento.isFinalizado()) {
+			return new ModelAndView("redirect:/eventos/finalizado/"+evento.getId());
 		}
 		if (user!=null && evento.getOwner().getId().equals(user.getId())) {
 			ModelAndView mv = new ModelAndView("evento-update");
@@ -124,10 +130,12 @@ public class EventoController {
 		}
 	}
 	
-	@RequestMapping("finalizado")
-	public ModelAndView evento_finalizado(RedirectAttributes attr) {
+	@RequestMapping("finalizado/{eventoId}")
+	public ModelAndView evento_finalizado(RedirectAttributes attr,@PathVariable Long eventoId ) {
+		Evento evento = eventodao.findById(eventoId);
+		System.out.println("evento = "+evento);
 		attr.addFlashAttribute("message_success", "Evento finalizado com sucesso.");
-		return new ModelAndView("evento-finalizado");
+		return new ModelAndView("evento-finalizado").addObject("evento", evento);
 	}
 	
 	@RequestMapping("finalizar/{eventoId}")
@@ -173,8 +181,9 @@ public class EventoController {
 					}
 				}
 			}
-			
-			return new ModelAndView("redirect:/eventos/finalizado");
+		    ev.setFinalizado(true);
+		    eventodao.update(eventoId, ev);
+			return new ModelAndView("redirect:/eventos/finalizado/"+ev.getId());
 	}
 	@RequestMapping("update/{eventoId}")
 	public ModelAndView update(HttpSession session, @PathVariable Long eventoId, @Valid Evento evento,
@@ -188,7 +197,7 @@ public class EventoController {
 			if (e != null) {
 				attr.addFlashAttribute("message_success", "Evento atualizado!");
 				attr.addFlashAttribute("evento", e);
-				return new ModelAndView("redirect:/eventos/");
+				return new ModelAndView("redirect:/eventos/{eventoId}") ;
 			} else {
 				attr.addFlashAttribute("message_error", "Evento nao pode ser atualizado.");
 				attr.addFlashAttribute("evento", e);
@@ -263,6 +272,25 @@ public class EventoController {
 			ModelAndView mv = new ModelAndView("redirect:/eventos/" + evento.getId());
 			return mv;
 		}
+	}
+	
+	@RequestMapping("/avaliar/desempenho")
+	public ModelAndView avaliarDesempenho(HttpSession session,
+			@RequestParam("idcandidatovaga") Long idcandidatovaga,
+			@RequestParam("star") Integer nota,
+			RedirectAttributes attr) {
+		User user = (User) session.getAttribute("user");
+		if (user == null)
+			return new ModelAndView("redirect:/eventos/");
+		Candidato_Vaga cv = candidatovagadao.findById(idcandidatovaga);
+		Evento evento = cv.getVaga().getEvento();
+		System.out.println("evento"+evento);
+		if(cv.getNota_desempenho()>0) {
+			return new ModelAndView("evento-finalizado").addObject("evento", evento).addObject("message_error", "Esse  candidato ja foi avaliado!");
+		}
+		cv.setNota_desempenho(nota);
+		candidatovagadao.update(cv.getId(), cv);
+		return new ModelAndView("evento-finalizado").addObject("evento", evento).addObject("message_success", "Candidato avaliado com sucesso!");
 	}
 
 }
